@@ -1,0 +1,17 @@
+{% extends 'messages_app/base.html' %}
+
+{% block title %}Inbox{% endblock %}
+
+{% block content %}
+<h2>Your Inbox</h2>
+<ul class="list-group">
+    {% for conversation in conversations %}
+        <li class="list-group-item">
+            <a href="{% url 'conversation_view' conversation.id %}">Conversation with: 
+            {{ conversation.participants.all|join:", " }}</a>
+        </li>
+    {% empty %}
+        <li class="list-group-item">No conversations found.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'messages_app/base.html' %}
+
+{% block title %}Send Message{% endblock %}
+
+{% block content %}
+<h2>Send a Message to {{ recipient.username }}</h2>
+<form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <textarea name="content" class="form-control" rows="3" placeholder="Type your message here..." required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Send</button>
+</form>
+{% endblock %}

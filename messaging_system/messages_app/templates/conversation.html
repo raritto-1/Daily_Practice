@@ -1,0 +1,26 @@
+{% extends 'messages_app/base.html' %}
+
+{% block title %}Conversation{% endblock %}
+
+{% block content %}
+<h2>Conversation</h2>
+<ul class="list-group mb-4">
+    {% for message in messages %}
+        <li class="list-group-item">
+            <strong>{{ message.sender.username }}:</strong> {{ message.content }} 
+            <small class="text-muted">({{ message.timestamp }})</small>
+        </li>
+    {% empty %}
+        <li class="list-group-item">No messages found in this conversation.</li>
+    {% endfor %}
+</ul>
+
+<h4>Send a New Message</h4>
+<form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <textarea name="content" class="form-control" rows="3" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Send</button>
+</form>
+{% endblock %}
