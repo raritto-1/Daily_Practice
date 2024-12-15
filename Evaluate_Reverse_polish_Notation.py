@@ -4,6 +4,7 @@ class Solution(object):
         :type tokens: List[str]
         :rtype: int
         """
+
         stack = []
         op = {
             "+": lambda a, b: a + b,
@@ -24,5 +25,5 @@ class Solution(object):
 
 
 solution = Solution()
-result = solution.evalRPN(["10","6","9","3","+","-11","*","/","*","17","+","5","+"])
-print(result)  
+file = solution.evalRPN(["10","6","9","3","+","-11","*","/","*","17","+","5","+"])
+print(file)  
