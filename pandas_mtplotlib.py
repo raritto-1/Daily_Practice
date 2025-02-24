@@ -90,4 +90,38 @@ newdf.loc[0, "F"] = "alit"
 
 newdf.drop('F',axis=1)
 
-0
+newdf.loc[14, "C"] = 39
+
+da= newdf.loc[(newdf["A"]< .3)]
+
+newdf = newdf.drop(columns=["F"])
+
+newdf.head()
+
+newdf.mean()
+
+newdf.loc[:, ["B"]] = 0
+
+newdf["B"].isnull()
+
+df = pd.DataFrame({
+    "Height_cm": [150, 165, np.nan, 175, 160],
+    "Weight_kg": [50, np.nan, 80, 75, 60],
+    "Age": [20, 25, 30, np.nan, 22],
+    "City": ["Delhi", "Mumbai", "Bangalore", "Chennai", np.nan]
+})
+
+df.iloc[4,3] = "Mumbai"
+
+df.fillna(3, inplace = True)
+
+df = df.drop_duplicates(subset = ["City"], keep="first")
+
+df = pd.DataFrame(np.random.rand(3,4))
+
+df
+
+df.columns = ["age", "marks", "salary", "name"]
+
+df.min()
+
