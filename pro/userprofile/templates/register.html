@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block start %}
+<div class="container mt-5">
+    <!-- Display Messages -->
+    {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+                {% if 'successfully' in message %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message|safe }}
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Registration Form Card -->
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-4">
+                    <h3 class="text-center mb-4">Create an Account</h3>
+                    <form method="POST" action="">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control rounded-pill" id="username" name="username" placeholder="Enter your username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control rounded-pill" id="email" name="email" placeholder="Enter your email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control rounded-pill" id="password" name="password" placeholder="Enter your password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control rounded-pill" id="confirm_password" name="confirm_password" placeholder="Re-enter your password" required>
+                        </div>
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-block rounded-pill">Register</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

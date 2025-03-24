@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block start %}
+<div class="container mt-5">
+    <!-- Display Messages -->
+    {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Login Form Card -->
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-4">
+                    <h3 class="text-center mb-4">Login</h3>
+                    <form method="POST" action="">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control rounded-pill" id="username" name="username" placeholder="Enter your username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control rounded-pill" id="password" name="password" placeholder="Enter your password" required>
+                        </div>
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-block rounded-pill">Login</button>
+                        </div>
+                    </form>
+
+                    <!-- Not Registered? -->
+                    <p class="text-center mt-3">
+                        Don't have an account? <a href="{% url 'register' %}">Register here</a>.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
