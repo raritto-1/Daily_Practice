@@ -19,6 +19,7 @@ from django.shortcuts import render, redirect
 def fun(request):
     profiles = Profile.objects.all() 
     return render(request, "base.html", {"profiles": profiles})
+
 @login_required
 def search_bar(request): 
     if request.method == "POST":
@@ -192,9 +193,6 @@ def profile_update(request):
         return redirect(reqest, "proifle_update,html',{form: form})
 
 '''
-
-
-
 
 
 

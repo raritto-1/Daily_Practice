@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Django App</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    {% load static %}
+    <style>
+        .navbar {
+            background-color: rgb(147, 155, 149); /* Grey color */
+        }
+        .post {
+            border: 1px solid #ccc;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .post-author {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .post-image img {
+            max-width: 100%; /* Make images responsive */
+            height: auto;
+            display: block; /* Remove extra space below image */
+            margin-bottom: 10px; /* Add some space below the image */
+        }
+        .post-date {
+            font-size: 0.8em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand text-white" href="/">prototype</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav ml-auto">
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href = {%url "upload_post"%}>post</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'profile_update' %}">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'register' %}">Register</a>
+                    </li>
+                {% endif %}
+            </ul>
+            <form class="form-inline my-2 my-lg-0 ml-3" method="POST" action="{% url 'search_bar' %}">
+                {% csrf_token %}
+                <input class="form-control mr-sm-2" type="search" name="search" placeholder="Search users" aria-label="Search">
+                <button class="btn btn-outline-light my-2 my-sm-0" type="submit">Search</button>
+            </form>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% for i in item %}
+            {{ i }}
+        {% endfor %}
+
+        {% if users %}
+            <h3>Search Results:</h3>
+            <ul>
+                {% for user in users %}
+                    <li>{{ user.username }}</li>
+                {% endfor %}
+            </ul>
+        {% elif error %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        <h3>Posts:</h3>
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                {% for post in posts %}
+                    <div class="post mb-4">
+                        <div class="post-author">
+                            <strong>{{ post.user.username }}</strong>
+                            <span class="post-date float-right">{{ post.created_at }}</span>
+                        </div>
+                        <hr>
+                        {% if post.image %}
+                            <div class="post-image">
+                                <img src="{{ post.image.url }}" alt="Post Image" class="img-fluid rounded">
+                            </div>
+                        {% endif %}
+                        {% comment %} We are not displaying the description for now {% endcomment %}
+                        {% comment %} We are not including like/comment options for now {% endcomment %}
+                    </div>
+                {% empty %}
+                    <p>No posts yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {% block start %}
+
+    {% endblock %}
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

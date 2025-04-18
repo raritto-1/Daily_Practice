@@ -39,3 +39,29 @@ class ler(models.Model):
     username = models.CharField(max_length=100, unique=True)
     email_ler = models.EmailField()
     password = models.CharField(max_length=128)
+
+# from django.db import models
+# from django.contrib.auth.models import User
+# from django.core.validators import FileExtensionValidator
+# import os
+
+# def user_post_directory_path(instance, filename):
+#     """Generates the upload path for the post image."""
+#     return f'user_{instance.user.id}/posts/{filename}'
+
+# class Post(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
+#     image = models.ImageField(
+#         upload_to=user_post_directory_path,
+#         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif'])],
+#         null=True,
+#         blank=True
+#     )
+#     description = models.TextField(null=True, blank=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
+
+#     def __str__(self):
+#         return f"{self.user.username} - {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+
+#     class Meta:
+#         ordering = ['-created_at'] # Optional: Order posts by creation date (newest first)
