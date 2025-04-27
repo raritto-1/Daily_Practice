@@ -84,29 +84,7 @@
             <div class="alert alert-danger">{{ error }}</div>
         {% endif %}
 
-        <h3>Posts:</h3>
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                {% for post in posts %}
-                    <div class="post mb-4">
-                        <div class="post-author">
-                            <strong>{{ post.user.username }}</strong>
-                            <span class="post-date float-right">{{ post.created_at }}</span>
-                        </div>
-                        <hr>
-                        {% if post.image %}
-                            <div class="post-image">
-                                <img src="{{ post.image.url }}" alt="Post Image" class="img-fluid rounded">
-                            </div>
-                        {% endif %}
-                        {% comment %} We are not displaying the description for now {% endcomment %}
-                        {% comment %} We are not including like/comment options for now {% endcomment %}
-                    </div>
-                {% empty %}
-                    <p>No posts yet.</p>
-                {% endfor %}
-            </div>
-        </div>
+        
     </div>
 
     {% block start %}

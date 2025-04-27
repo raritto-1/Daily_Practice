@@ -3,6 +3,7 @@ from django.contrib import messages
 from .models import Post  # Import your Post model
 from django.contrib.auth.decorators import login_required #restrict to logged in users
 from django.contrib.auth.models import User
+from .models import Post
 
 @login_required # Apply the login required decorator
 def upload_post(request):
@@ -35,4 +36,14 @@ def upload_post(request):
     else:
         # If the request method is not POST, render the upload form
         return render(request, 'upload_post.html')
+
+
+
+
+@login_required
+def post_list(request):
+    posts = Post.objects.all()  
+    context = {'posts': posts}  
+    return render(request, 'bodymain.html', context) 
+
 
