@@ -108,7 +108,7 @@ def user_profile(request, username):
 #     return render(request, "profile_update.html", {"postdata": user})
 # #     pass
 
-#add this import
+
 
 # def profile_update(request):
 #     user = request.user
