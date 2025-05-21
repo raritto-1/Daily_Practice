@@ -1,0 +1,386 @@
+{% extends 'index.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* Reset and base (applied to the whole page, so potentially adjust) */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    main {
+    flex-grow: 1;
+    max-width: 600px;
+    margin: 16px auto 40px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgb(29 161 242 / 0.15);
+    overflow: hidden;
+    }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f5f8fa;
+        color: #333;
+        min-height: 100vh; /* Make body full height */
+        display: flex;
+        flex-direction: column; /* For sticky footer if needed */
+    }
+
+    
+    nav {
+        background:rgb(250, 245, 245);
+        padding: 0 16px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 8px rgb(245, 243, 243);
+        color: #f2481d;
+    }
+    nav .brand {
+        font-weight: 700;
+        font-size: 1.4rem;
+        user-select: none;
+        letter-spacing: 1px;
+    }
+    nav a {
+        color: #ddd;
+        text-decoration: none;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        border-radius: 24px;
+        background: #222;
+        box-shadow: inset 0 0 5pxrgba(29, 157, 242, 0.67);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    nav a:hover,
+    nav a:focus {
+        background-color: #1da1f255;
+        box-shadow: inset 0 0 10px 2px #f23d1de3;
+        outline: none;
+    }
+    nav a svg {
+        fill: #f21d1d;
+        width: 20px;
+        height: 20px;
+        margin-right: 6px;
+    }
+
+    /* Main container */
+    .profile-container {
+        flex-grow: 1; /* Take up available space */
+        max-width: 600px;
+        margin: 16px auto 40px; /* Space above and below, and center */
+        background: white;
+        border-radius: 14px;
+        box-shadow: 0 8px 20px rgba(29, 161, 242, 0.15);
+        overflow: hidden;
+    }
+
+    /* Profile header */
+    .profile-header {
+        background:rgb(3, 211, 248);
+        color: white;
+        padding: 24px 20px 32px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .profile-header .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 5px solid white;
+        box-shadow: 0 0 16px rgba(255, 255, 255, 0.6);
+        overflow: hidden; /* Ensure image doesn't overflow */
+        margin-bottom: 16px;
+    }
+    .profile-header .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Important for circular avatar */
+    }
+
+    .profile-header h1 {
+        margin-top: 0; /* Reset default margin */
+        font-weight: 700;
+        font-size: 2rem;
+    }
+    .profile-header .profile-bio {
+        margin: 8px 0 16px;
+        font-size: 1rem;
+        font-style: italic;
+        color: #dce9fb;
+        max-width: 280px;
+        white-space: pre-line; /* Preserve newlines from Django model */
+    }
+    .profile-header .profile-location {
+        font-size: 0.9rem;
+        margin-bottom: 24px;
+        color: #c3d9fc;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        justify-content: center;
+    }
+    .profile-header .profile-location svg { /* You might need a location icon */
+        width: 16px;
+        height: 16px;
+        fill: #c3d9fc;
+    }
+    .profile-header .profile-stats {
+        display: flex;
+        justify-content: center; /* Center stats on small screens */
+        gap: 20px; /* Adjust as needed */
+        margin-bottom: 20px;
+    }
+    .profile-header .profile-stats span {
+        font-size: 0.9rem;
+        color: #ddd;
+    }
+
+    .profile-header .follow-btn {
+        background: white;
+        color: #1da1f2;
+        font-weight: 600;
+        border: none;
+        border-radius: 24px;
+        padding: 10px 28px;
+        box-shadow: 0 0 8px #1785dfcc;
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .profile-header .follow-btn:hover,
+    .profile-header .follow-btn:focus {
+        background: #1785df;
+        color: white;
+        outline: none;
+    }
+    .profile-header .follow-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    .profile-header .follow-btn .spinner {
+        width: 1em;
+        height: 1em;
+        border-radius: 50%;
+        border: 0.2em solid currentColor;
+        border-color: #fff;
+        border-top-color: #1da1f2;
+        animation: spin 1s infinite linear;
+        display: inline-block;
+        margin-right: 0.5em;
+    }
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+
+    /* Posts grid */
+    .profile-posts {
+        padding: 16px 12px 24px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+    .profile-posts .post {
+        background: #ddd;
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        aspect-ratio: 1 / 1;
+        cursor: pointer;
+        box-shadow: 0 3px 8px rgba(29, 161, 242, 0.2);
+        transition: transform 0.3s ease;
+    }
+    .profile-posts .post:hover,
+    .profile-posts .post:focus {
+        transform: scale(1.05);
+        outline: none;
+    }
+    .profile-posts .post img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .profile-posts .post-overlay {
+        position: absolute;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+    .profile-posts .post:hover .post-overlay {
+        opacity: 1;
+    }
+    .profile-posts .post-overlay span {
+        color: white;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+    }
+    .profile-posts .post-overlay .like-icon { /* You'll need to define this */
+        /* Example:  You can use a simple heart SVG or a font icon */
+        width: 1em;
+        height: 1em;
+        background: url('data:image/svg+xml,<svg...></svg>'); /* Replace with your SVG */
+        mask-image: url('data:image/svg+xml,<svg...></svg>');
+        -webkit-mask-image: url('data:image/svg+xml,<svg...></svg>');
+        background-color: white;
+    }
+
+
+    .profile-posts .no-posts {
+        padding: 16px;
+        text-align: center;
+        font-size: 1rem;
+        color: #666;
+    }
+
+
+    /* Footer (optional) -  Consider if this should be in base.html */
+    footer {
+        text-align: center;
+        font-size: 0.9rem;
+        color: #aaa;
+        padding: 12px 0;
+    }
+
+    /* Responsive - Mobile fits 350px width, max 600px height */
+    @media (max-width: 400px) {
+        .profile-container {
+            width: 90vw;
+            margin: 12px auto 32px;
+            border-radius: 12px;
+        }
+        .profile-header .profile-avatar {
+            width: 96px;
+            height: 96px;
+            border-width: 4px;
+        }
+        .profile-header h1 {
+            font-size: 1.6rem;
+        }
+        .profile-header .profile-bio {
+            font-size: 0.9rem;
+            max-width: 90vw;
+        }
+        .profile-header .actions {
+            flex-direction: column;
+            gap: 12px;
+        }
+        .profile-header button {
+            padding: 10px 20px;
+        }
+        .profile-header .profile-stats {
+            flex-direction: column; /* Stack stats on small screens */
+            gap: 12px;
+        }
+        .profile-posts {
+            grid-template-columns: repeat(2, 1fr); /* 2 columns on very small screens */
+        }
+    }
+    @media (max-width: 320px){
+       .profile-posts {
+            grid-template-columns: 1fr; /* 1 column on very very small screens */
+        }
+    }
+</style>
+    
+    <main>
+        <section class="profile-header" aria-label="User Profile Header">
+            <div class="profile-avatar">
+                <img src="{{ profile_user.profile.avatar.url }}"
+                     alt="{{ profile_user.username }}'s avatar"
+                     onerror="this.src='{% static 'avatar/default.jpg' %}'">
+            </div>
+            <h1>{{ profile_user.username }}</h1>
+            <div class="profile-stats">
+                <span>{{ profile_user.profile.post_count }} posts</span>
+                <span>{{ profile_user.profile.followers_count }} followers</span>
+                <span>{{ profile_user.profile.following_count }} following</span>
+            </div>
+
+            <p class="profile-bio">{{ profile_user.profile.bio|default:"" }}</p>
+            <p class="profile-location">{{ profile_user.profile.location|default:"" }}</p>
+
+            {% if is_own_profile %}
+                {# Disabled edit-profile link for now #}
+            {% else %}
+                <button class="follow-btn" data-username="{{ profile_user.username }}">
+                    {% if request.user in profile_user.profile.followers.all %}Unfollow{% else %}Follow{% endif %}
+                </button>
+            {% endif %}
+        </section>
+
+        <section class="profile-posts" aria-label="User posts">
+            {% for post in posts %}
+                <a href="#" class="post" tabindex="0" aria-label="View post {{ forloop.counter }}">
+                    <img src="{{ post.image.url }}" alt="Post by {{ post.user.username }}">
+                     <div class="post-overlay">
+                        <span><i class="like-icon"></i> {{ post.likes.count }}</span>
+                    </div>
+                    
+                </a>
+            {% empty %}
+                <p class="no-posts">No posts yet</p>
+            {% endfor %}
+        </section>
+    </main>
+    <footer>
+        &copy; 2024 SocialMe. All rights reserved.
+    </footer>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const followBtn = document.querySelector('.follow-btn');
+    if (followBtn) {
+        followBtn.addEventListener('click', async function() {
+            const username = this.dataset.username;
+            const btn = this;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>';
+
+            try {
+                const response = await fetch(`/follow/${username}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    btn.textContent = data.action === 'follow' ? 'Unfollow' : 'Follow';
+                    const stats = document.querySelectorAll('.profile-stats span');
+                    if (stats.length >= 2) {
+                        stats[1].textContent = `${data.followers_count} followers`;
+                    }
+                } else {
+                    alert(data.error || 'An error occurred');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Network error occurred');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = btn.textContent; // Restore original text
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
