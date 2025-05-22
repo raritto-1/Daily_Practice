@@ -324,4 +324,36 @@ nav {
     .nav-links.mobile-active a svg {
         margin-right: 0.5rem;
     }
+    .post {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1; /* Makes it a perfect square */
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.post img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the image fills the box and is cropped if necessary */
+  display: block;
+}
+
+.post-overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  text-align: center;
+  font-size: 14px;
+  transition: background 0.3s ease;
+}
+
+.post:hover .post-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
 }

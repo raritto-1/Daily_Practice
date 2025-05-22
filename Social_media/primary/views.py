@@ -10,7 +10,24 @@ from django.views.decorators.http import require_POST
 @login_required(login_url='login')
 def main(request):
     posts = Post.objects.all()
-    return render(request, "index.html", {"user": request.user, "posts": posts})
+    logged_in_user_profile = None
+    if hasattr(request.user, 'profile'):
+        logged_in_user_profile = request.user.profile
+    else:
+        # Handle cases where a user might not have a profile yet (e.g., redirect to create one)
+        # For now, we'll just leave it as None or log a warning.
+        print(f"Warning: User {request.user.username} does not have a profile.")
+
+    context = {
+        'posts': posts,
+        'profile_user': request.user,  # This will be the User object of the logged-in user
+        'logged_in_user_profile': logged_in_user_profile, # If you prefer a more explicit name for the profile object
+    }
+    return render(request, 'index.html', context)
+    # profile_user = request.user
+    # posts = Post.objects.all()
+    
+    # return render(request, "index.html", {"user": request.user, "posts": posts})
 
 def user_login(request):
     if request.method == "POST":
@@ -60,16 +77,18 @@ def user_logout(request):
 
 @login_required
 def profile_view(request):
-    # Fetch the profile of the logged-in user using request.user
     profile_user = request.user
-    posts = Post.objects.filter(user=profile_user).order_by('-created_at')  # Corrected ordering
-    
+    Profile.objects.get_or_create(user=profile_user)
+
+    posts = Post.objects.filter(user=profile_user).order_by('-created_at')
+
     context = {
         'profile_user': profile_user,
         'posts': posts,
-        'is_own_profile': request.user == profile_user  # Check if it's the user's own profile
+        'is_own_profile': request.user == profile_user,
     }
     return render(request, 'profile.html', context)
+
 
 @login_required
 @require_POST
@@ -93,6 +112,7 @@ def follow_user(request, username):
             
         return JsonResponse({
             'action': action,
+            
             'followers_count': profile.followers.count(),
             'following_count': request.user.profile.following_count
         })
@@ -138,7 +158,28 @@ def upload_post(request):
 
 
 @login_required
-def delete_post(request, id):
-    post = get_object_or_404(Post, id=id, user=request.user)
-    post.delete()
-    return redirect('profile')
+@require_POST
+def delete_post(request, post_id):
+    if request.method == 'POST':
+        post = get_object_or_404(Post, id=post_id, user=request.user)
+        post.delete()
+        return JsonResponse({'success': True})
+    return JsonResponse({'success': False, 'error': 'Invalid request'}, status=400)
+
+
+from .models import Notification
+
+@login_required
+def notification_list(request):
+    notifications = request.user.notifications.order_by('-timestamp')
+    return render(request, 'notification.html', {'notifications': notifications})
+
+@login_required
+def mark_notification_read(request, pk):
+    notification = get_object_or_404(Notification, pk=pk, user=request.user)
+    if request.method == 'POST':
+        notification.is_read = True
+        notification.save()
+    return redirect('notifications')
+
+

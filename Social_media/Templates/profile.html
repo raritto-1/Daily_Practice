@@ -297,51 +297,130 @@
             grid-template-columns: 1fr; /* 1 column on very very small screens */
         }
     }
+    {% comment %} .post {
+        position: relative; /* Essential for positioning the dropdown */
+    } {% endcomment %}
+
+    .post-options {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        z-index: 10; /* Ensure it's above the image */
+    }
+
+    .three-dots-btn {
+        background: rgba(0, 0, 0, 0.5);
+        border: none;
+        border-radius: 50%;
+        color: white;
+        font-size: 1.2em;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+
+    .three-dots-btn:hover {
+        background: rgba(241, 241, 241, 0.7);
+    }
+
+    .options-dropdown {
+        display: none; /* Hidden by default */
+        position: absolute;
+        top: 35px; /* Position below the button */
+        right: 0;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        min-width: 120px;
+        overflow: hidden;
+    }
+
+    .options-dropdown.show {
+        display: block; /* Show when 'show' class is added by JS */
+    }
+
+    .options-dropdown button {
+        width: 100%;
+        padding: 10px 15px;
+        background: none;
+        border: none;
+        text-align: left;
+        cursor: pointer;
+        font-size: 0.95em;
+        color: #333;
+        transition: background-color 0.2s ease;
+    }
+
+    .options-dropdown button:hover {
+        background: #f0f0f0;
+    }
+
+    .options-dropdown .delete-option {
+        color: #dc3545; /* Red color for delete */
+    }
+
+    .options-dropdown .delete-option:hover {
+        background: #ffe6e6;
+    }
 </style>
-    
-    <main>
-        <section class="profile-header" aria-label="User Profile Header">
-            <div class="profile-avatar">
-                <img src="{{ profile_user.profile.avatar.url }}"
-                     alt="{{ profile_user.username }}'s avatar"
-                     onerror="this.src='{% static 'avatar/default.jpg' %}'">
-            </div>
-            <h1>{{ profile_user.username }}</h1>
-            <div class="profile-stats">
-                <span>{{ profile_user.profile.post_count }} posts</span>
-                <span>{{ profile_user.profile.followers_count }} followers</span>
-                <span>{{ profile_user.profile.following_count }} following</span>
-            </div>
 
-            <p class="profile-bio">{{ profile_user.profile.bio|default:"" }}</p>
-            <p class="profile-location">{{ profile_user.profile.location|default:"" }}</p>
+<main>
+    <section class="profile-header" aria-label="User Profile Header">
+        <div class="profile-avatar">
+            <img src="{{ profile_user.profile.avatar.url }}"
+                 alt="{{ profile_user.username }}'s avatar"
+                 onerror="this.src='{% static 'avatar/default.jpg' %}'">
+        </div>
+        <h1>{{ profile_user.username }}</h1>
+        <div class="profile-stats">
+            <span>{{ profile_user.profile.post_count }} posts</span>
+            <span>{{ profile_user.profile.followers_count }} followers</span>
+            <span>{{ profile_user.profile.following_count }} following</span>
+        </div>
 
-            {% if is_own_profile %}
-                {# Disabled edit-profile link for now #}
-            {% else %}
-                <button class="follow-btn" data-username="{{ profile_user.username }}">
-                    {% if request.user in profile_user.profile.followers.all %}Unfollow{% else %}Follow{% endif %}
-                </button>
-            {% endif %}
-        </section>
+        <p class="profile-bio">{{ profile_user.profile.bio|default:"" }}</p>
+        <p class="profile-location">{{ profile_user.profile.location|default:"" }}</p>
 
-        <section class="profile-posts" aria-label="User posts">
-            {% for post in posts %}
-                <a href="#" class="post" tabindex="0" aria-label="View post {{ forloop.counter }}">
-                    <img src="{{ post.image.url }}" alt="Post by {{ post.user.username }}">
-                     <div class="post-overlay">
-                        <span><i class="like-icon"></i> {{ post.likes.count }}</span>
+        {% if is_own_profile %}
+            {# Disabled edit-profile link for now #}
+        {% else %}
+            <button class="follow-btn" data-username="{{ profile_user.username }}">
+                {% if request.user in profile_user.profile.followers.all %}Unfollow{% else %}Follow{% endif %}
+            </button>
+        {% endif %}
+    </section>
+
+    <section class="profile-posts" aria-label="User posts">
+        {% for post in posts %}
+            <div class="post" tabindex="0" aria-label="View post {{ forloop.counter }}">
+                <img src="{{ post.image.url }}" alt="Post by {{ post.user.username }}">
+                 <div class="post-overlay">
+                    <span><i class="like-icon"></i> {{ post.likes.count }}</span>
+                </div>
+
+                {# Only show options if it's the user's own post #}
+                {% if is_own_profile %}
+                    <div class="post-options">
+                        <button class="three-dots-btn" aria-label="Post options">&#8230;</button> {# Three dots character #}
+                        <div class="options-dropdown">
+                            <button class="delete-option" data-post-id="{{ post.id }}">Delete</button>
+                            {# Add other options here if needed, e.g., "Edit", "Share" #}
+                        </div>
                     </div>
-                    
-                </a>
-            {% empty %}
-                <p class="no-posts">No posts yet</p>
-            {% endfor %}
-        </section>
-    </main>
-    <footer>
-        &copy; 2024 SocialMe. All rights reserved.
-    </footer>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p class="no-posts">No posts yet</p>
+        {% endfor %}
+    </section>
+</main>
+<footer>
+    &copy; 2024 SocialMe. All rights reserved.
+</footer>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const followBtn = document.querySelector('.follow-btn');
@@ -381,6 +460,68 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // --- JavaScript for Three Dots and Delete Option ---
+    document.querySelectorAll('.three-dots-btn').forEach(button => {
+        button.addEventListener('click', function(event) {
+            const dropdown = this.nextElementSibling; // The dropdown menu
+            // Close any other open dropdowns
+            document.querySelectorAll('.options-dropdown.show').forEach(openDropdown => {
+                if (openDropdown !== dropdown) {
+                    openDropdown.classList.remove('show');
+                }
+            });
+            dropdown.classList.toggle('show');
+            event.stopPropagation(); // Prevent document click from immediately closing
+        });
+    });
+
+    // Close dropdowns when clicking anywhere outside
+    document.addEventListener('click', function(event) {
+        document.querySelectorAll('.options-dropdown.show').forEach(dropdown => {
+            if (!dropdown.contains(event.target) && !event.target.classList.contains('three-dots-btn')) {
+                dropdown.classList.remove('show');
+            }
+        });
+    });
+
+    // Handle delete button click
+    document.querySelectorAll('.delete-option').forEach(button => {
+        button.addEventListener('click', async function() {
+            const postId = this.dataset.postId;
+            if (confirm('Are you sure you want to delete this post?')) {
+                try {
+                    const response = await fetch(`/posts/${postId}/delete/`, { // Adjust URL as needed
+                        method: 'POST',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        alert(data.message);
+                        // Remove the post element from the DOM
+                        this.closest('.post').remove();
+                        // Optionally update post count
+                        const postCountSpan = document.querySelector('.profile-stats span:first-child');
+                        if (postCountSpan) {
+                            let currentCount = parseInt(postCountSpan.textContent.split(' ')[0]);
+                            postCountSpan.textContent = `${currentCount - 1} posts`;
+                        }
+
+                    } else {
+                        alert(data.error || 'Failed to delete post.');
+                    }
+                } catch (error) {
+                    console.error('Error deleting post:', error);
+                    alert('Network error occurred during deletion.');
+                }
+            }
+        });
+    });
 });
 </script>
 {% endblock %}

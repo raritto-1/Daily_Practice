@@ -13,6 +13,9 @@ urlpatterns = [
     path('follow/<str:username>/', follow_user, name='follow_user'),   
     path('edit_profile/', edit_profile, name='edit_profile'),
     path('upload_post/', upload_post, name='upload_post'),
-    path('delete-post/<int:id>/', delete_post, name='delete_post')
+    path('posts/<int:post_id>/delete/', delete_post, name='delete_post'),
+    path('notifications/', notification_list, name='notifications'),
+    path('notifications/<int:pk>/read/', mark_notification_read, name='mark_notification_read'),
+
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
