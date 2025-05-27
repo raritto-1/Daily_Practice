@@ -16,6 +16,7 @@ urlpatterns = [
     path('posts/<int:post_id>/delete/', delete_post, name='delete_post'),
     path('notifications/', notification_list, name='notifications'),
     path('notifications/<int:pk>/read/', mark_notification_read, name='mark_notification_read'),
+    path('update_avatar/', update_avatar, name='update_avatar'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

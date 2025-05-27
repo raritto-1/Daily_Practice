@@ -25,7 +25,7 @@ class Profile(models.Model):
         return self.user.following.count()
 
     def __str__(self):
-        return self.user.username
+        return self.user.username, self.user.password
 
 class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")

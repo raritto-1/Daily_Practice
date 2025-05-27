@@ -4,8 +4,11 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .models import Profile, Post
-from django.http import JsonResponse
+from django.http import JsonResponse 
 from django.views.decorators.http import require_POST
+
+
+
 
 @login_required(login_url='login')
 def main(request):
@@ -120,24 +123,43 @@ def follow_user(request, username):
         return JsonResponse({'error': str(e)}, status=400)
 
 
-@login_required
+import json
+@require_POST
 def edit_profile(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
     
-    profile = Profile.objects.get(user=request.user)
+    data = json.loads(request.body)
+    profile = request.user.profile
     
-    if request.method == "POST":
+    if 'bio' in data:
+        profile.bio = data['bio']
+    if 'location' in data:
+        profile.location = data['location']
+    
+    profile.save()
+    return JsonResponse({'status': 'success'})
+
+@require_POST
+def update_avatar(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Unauthorized'}, status=401)
+    
+    try:
+        # For FormData uploads, we don't use request.body
+        if 'avatar' not in request.FILES:
+            return JsonResponse({'error': 'No file provided'}, status=400)
         
-        new_bio = request.POST.get('bio', '')
-        profile.bio = new_bio
+        profile = request.user.profile
+        profile.avatar = request.FILES['avatar']
         profile.save()
-
-        messages.success(request, 'Profile updated successfully!')
-        return redirect('profile_view')  
-
-    
-    return render(request, 'edit_profile.html', {'profile': profile})
-
-
+        
+        return JsonResponse({
+            'status': 'success',
+            'avatar_url': profile.avatar.url
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 @login_required
 def upload_post(request):
     if request.method == 'POST':
